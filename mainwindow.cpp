@@ -34,22 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-void MainWindow::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        m_dragPos = event->globalPos() - frameGeometry().topLeft();
-        event->accept();
-    }
-}
-
-void MainWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    if (event->buttons() & Qt::LeftButton) {
-        move(event->globalPos() - m_dragPos);
-        event->accept();
-    }
-}
-
 void MainWindow::applyMainwindowSize()
 {
     const QSize label = ui->timeLabel->sizeHint();
@@ -107,30 +91,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         }
         return true;
     }
-
-//    if (event->type() == QEvent::MouseButtonPress) {
-//        auto *me = static_cast<QMouseEvent*>(event);
-//        if (me->button() == Qt::LeftButton) {
-//            auto *w = qobject_cast<QWidget*>(watched);
-//            if (!w) return false;
-
-//            const QPoint gpos = w->mapToGlobal(me->pos());
-//            m_dragPos = gpos - frameGeometry().topLeft();
-//            return true;
-//        }
-//    }
-
-//    if (event->type() == QEvent::MouseMove) {
-//        auto *me = static_cast<QMouseEvent*>(event);
-//        if (me->buttons() & Qt::LeftButton) {
-//            auto *w = qobject_cast<QWidget*>(watched);
-//            if (!w) return false;
-
-//            const QPoint gpos = w->mapToGlobal(me->pos());
-//            move(gpos - m_dragPos);
-//            return true;
-//        }
-//    }
 
     return QMainWindow::eventFilter(watched, event);
 }

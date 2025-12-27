@@ -25,8 +25,6 @@ public:
     void applyMainwindowSize();
     void setLabelFont();
 
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 private:
     Ui::MainWindow *ui;
