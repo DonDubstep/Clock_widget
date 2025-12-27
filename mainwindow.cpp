@@ -89,6 +89,11 @@ void MainWindow::readJson()
     int color_parse = root["last_color"].toInt();
     m_fontPt = root["last_size"].toInt();
     custom_color_parse = root["custom_color"].toString();
+    QString position_parse = root["last_pos"].toString();
+    QStringList position_str_list = position_parse.split(',', QString::SkipEmptyParts);
+    int pos_x = position_str_list[0].toInt();
+    int pos_y = position_str_list[1].toInt();
+    this->move(QPoint(pos_x, pos_y));
     color = color_parse;
 
     file.close();
@@ -147,6 +152,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     return QMainWindow::eventFilter(watched, event);
 }
 
+#include <QDebug>
 void MainWindow::rememberToJson()
 {
     QFile file(QCoreApplication::applicationDirPath() + "/src/CONFIG.json");
@@ -163,6 +169,9 @@ void MainWindow::rememberToJson()
     root["last_color"] = color;
     root["last_size"] = m_fontPt;
     root["custom_color"] = custom_color_parse;
+
+    QPoint position = this->pos();
+    root["last_pos"] = QString::number(position.x()) + ", " + QString::number(position.y());
 
     doc.setObject(root);
     file.write(doc.toJson(QJsonDocument::Indented));
