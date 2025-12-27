@@ -1,10 +1,12 @@
-QT       += core gui
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ClockApp
 TEMPLATE = app
 
 CONFIG += c++11
+
+RC_ICONS = src/icon.ico
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
