@@ -50,4 +50,5 @@ win64
 }
 
 DISTFILES += \
-    src/CONFIG.json
+    src/CONFIG.json \
+    README.md
