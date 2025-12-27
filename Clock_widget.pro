@@ -48,3 +48,6 @@ win64
     QMAKE_EXTRA_TARGETS += copydata
     PRE_TARGETDEPS += copydata
 }
+
+DISTFILES += \
+    src/CONFIG.json

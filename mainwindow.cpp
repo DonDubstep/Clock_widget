@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QTimer>
-#include <QTime>
-#include <QMouseEvent>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->centralwidget->installEventFilter(this);
     installEventFilter(this);
+    readJson();
 
     setFixedSize(size());
     setWindowFlags(windowFlags()
@@ -28,11 +27,72 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, &QTimer::timeout, this, [this](){
         ui->timeLabel->setText(QTime::currentTime().toString("hh:mm"));
     });
+    setColor();
     applyMainwindowSize();
-    ui->timeLabel->setStyleSheet("color: white");
     timer->start(1000);
 }
 
+void MainWindow::setColor()
+{
+    if(color == WHITE)
+    {
+        ui->timeLabel->setStyleSheet("color: white");
+    }
+    else if (color == BLACK)
+    {
+        ui->timeLabel->setStyleSheet("color: black");
+    }
+    else if(color == CUSTOM)
+    {
+        setCustomColor(custom_color_parse);
+    }
+}
+
+void MainWindow::changeColor()
+{
+    if(color == WHITE)
+    {
+        ui->timeLabel->setStyleSheet("color: black");
+        color = BLACK;
+    }
+    else if (color == BLACK)
+    {
+        setCustomColor(custom_color_parse);
+        color = CUSTOM;
+    }
+    else if(color == CUSTOM)
+    {
+        ui->timeLabel->setStyleSheet("color: white");
+        color = WHITE;
+    }
+}
+
+void MainWindow::setCustomColor(QString custom_color_parse)
+{
+    QStringList rgb_list = custom_color_parse.split(',', QString::SkipEmptyParts);
+    int r = rgb_list[0].toInt();
+    int g = rgb_list[1].toInt();
+    int b = rgb_list[2].toInt();
+    QString css_str = "color: rgb(" + QString::number(r) + "," + QString::number(g) + "," + QString::number(b) + ")";
+    ui->timeLabel->setStyleSheet(css_str);
+}
+
+void MainWindow::readJson()
+{
+    QFile file(QCoreApplication::applicationDirPath() + "/src/CONFIG.json");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        qWarning("Не открыть файл");
+    QByteArray raw_data = file.readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(raw_data);
+    QJsonObject root = doc.object();
+
+    int color_parse = root["last_color"].toInt();
+    m_fontPt = root["last_size"].toInt();
+    custom_color_parse = root["custom_color"].toString();
+    color = color_parse;
+
+    file.close();
+}
 
 void MainWindow::applyMainwindowSize()
 {
@@ -64,16 +124,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         // Нажимаем букву T
         if(key_event->key() == Qt::Key_C)
         {
-            if(color == WHITE)
-            {
-                ui->timeLabel->setStyleSheet("color: black");
-                color = BLACK;
-            }
-            else
-            {
-                ui->timeLabel->setStyleSheet("color: white");
-                color = WHITE;
-            }
+            changeColor();
         }
         else if(key_event->key() == Qt::Key_Plus)
         {
@@ -87,6 +138,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         }
         else if(key_event->key() == Qt::Key_F7)
         {
+            rememberToJson();
             QApplication::quit();
         }
         return true;
@@ -94,6 +146,30 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 
     return QMainWindow::eventFilter(watched, event);
 }
+
+void MainWindow::rememberToJson()
+{
+    QFile file(QCoreApplication::applicationDirPath() + "/src/CONFIG.json");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        qWarning("Не открыть файл");
+    QByteArray raw_data = file.readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(raw_data);
+    QJsonObject root = doc.object();
+    file.close();
+
+     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+         qWarning("Не открыть файл");
+
+    root["last_color"] = color;
+    root["last_size"] = m_fontPt;
+    root["custom_color"] = custom_color_parse;
+
+    doc.setObject(root);
+    file.write(doc.toJson(QJsonDocument::Indented));
+    file.close();
+}
+
+
 
 MainWindow::~MainWindow()
 {

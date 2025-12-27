@@ -1,6 +1,6 @@
 #pragma once
 #include <QWidget>
-#include <QPoint>
+#include <QMouseEvent>
 
 class DragArea : public QWidget
 {

@@ -1,5 +1,4 @@
 #include "dragarea.h"
-#include <QMouseEvent>
 
 DragArea::DragArea(QWidget *parent) : QWidget(parent)
 {
